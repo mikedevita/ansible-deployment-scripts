@@ -34,7 +34,7 @@ Sets up servers with some basic configurations
 
 
 ## Running
-To run with a vault file: `ansible-playbook playbook.yml --ask-vault-pass -i hosts`
-To run without a vault file: `ansible-playbook -i hosts playbook.yml`
-To create a new vault file: `ansible-vault create vault.yml`
-To edit the existing vault file: `ansible-vault edit vault.yml`
+1. To run with a vault file: `ansible-playbook playbook.yml --ask-vault-pass -i hosts`
+1. To run without a vault file: `ansible-playbook -i hosts playbook.yml`
+1. To create a new vault file: `ansible-vault create vault.yml`
+1. To edit the existing vault file: `ansible-vault edit vault.yml`
