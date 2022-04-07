@@ -1,0 +1,83 @@
+---
+
+- name: Update apt package cache and run upgrade safe
+  become: true
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+    upgrade: safe
+
+- name: Install Base Packages
+  apt: 
+    name: "{{ packages }}"
+    state: present
+    
+- name: "Ensure user '{{ user_name }}' is created"
+  user:
+    state: present
+    name: "{{ user_name }}"
+    uid: "{{ user_uid }}"
+    groups: "{{ user_groups }}"
+    shell: "{{ user_shell }}"
+    append: "{{ user_groups_append }}"
+    home: "{{ user_home }}"
+
+- name: "Ensure user '{{ user_name }}' ssh key Exists"
+  authorized_key:
+      user: "{{ user_name }}"
+      state: present
+      key: "{{ user_ssh_key }}"
+
+- name: "set timezone to {{ timezone }}"
+  timezone:
+    name: "{{ timezone }}"
+
+- name: Disallow root password SSH access
+  lineinfile: dest=/etc/ssh/sshd_config
+    regexp="^PermitRootLogin"
+    line="PermitRootLogin prohibit-password"
+    state=present
+  notify: Restart ssh
+
+- name: 'No sudo password'
+  lineinfile:
+      path: /etc/sudoers
+      state: present
+      regexp: '^%sudo'
+      line: '%sudo ALL=(ALL) NOPASSWD: ALL'
+      validate: 'visudo -cf %s'
+      
+- name: Clone oh-my-zsh repo for user
+  git:
+    repo: https://github.com/robbyrussell/oh-my-zsh.git
+    dest: "/home/{{ user_name }}/.oh-my-zsh"
+
+- name: "Setup user '{{ user_name }}' .zshrc"
+  get_url:
+    url: https://gist.githubusercontent.com/mikedevita/992a74c8e8276079f58e59d12db93dbc/raw/bdbf0308aa99e625093827b6ce17d8466ce9a20c/.zshrc
+    dest: "/home/{{ user_name }}/.zshrc"
+
+- name: "Setup user '{{ user_name }}' .vimrc"
+  get_url:
+    url: https://gist.githubusercontent.com/mikedevita/992a74c8e8276079f58e59d12db93dbc/raw/bdbf0308aa99e625093827b6ce17d8466ce9a20c/.vimrc
+    dest: "/home/{{ user_name }}/.vimrc"
+
+- name: "Install oh-my-zsh for root user"
+  git:
+    repo: https://github.com/robbyrussell/oh-my-zsh.git
+    dest: "/root/.oh-my-zsh"
+
+- name: "Setup root user .zshrc"
+  get_url:
+    url: https://gist.githubusercontent.com/mikedevita/992a74c8e8276079f58e59d12db93dbc/raw/bdbf0308aa99e625093827b6ce17d8466ce9a20c/.zshrc
+    dest: "/root/.zshrc"
+
+- name: "Setup root user .vimrc"
+  get_url:
+    url: https://gist.githubusercontent.com/mikedevita/992a74c8e8276079f58e59d12db93dbc/raw/bdbf0308aa99e625093827b6ce17d8466ce9a20c/.vimrc
+    dest: "/root/.vimrc"
+
+- name: "Set root users shell to zsh"
+  user:
+    name: 'root'
+    shell: '/usr/bin/zsh'

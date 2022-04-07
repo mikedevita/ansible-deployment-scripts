@@ -1,0 +1,9 @@
+---
+- name: provision vps
+  hosts: ndboost
+  remote_user: root
+  gather_facts: false
+  vars:
+    packages: [vim, htop, git, curl, ncdu, tmux, zsh]
+  roles:
+    - server

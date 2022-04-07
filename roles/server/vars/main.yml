@@ -1,0 +1,15 @@
+---
+user_name: mike
+user_uid: 1000
+user_groups: sudo
+user_shell: /bin/zsh
+user_groups_append: yes
+user_home: /home/mike
+user_ssh_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+packages:
+  - htop
+  - git
+  - vim
+  - zsh
+  - tmux
+timezone: America/Phoenix
